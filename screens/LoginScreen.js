@@ -1,18 +1,32 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Pressable, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Pressable, StyleSheet, Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
-    const validUsername = 'Test';
-    const validPassword = '1234';
+  const handleLogin = async () => {
+    if (username.length === 0 || password.length === 0) {
+      Alert.alert('Error', 'Please fill in all fields');
+      return;
+    }
 
-    if (username === validUsername && password === validPassword) {
-      navigation.navigate('Home');
-    } else {
-      alert('Invalid credentials');
+    try {
+      const user = await AsyncStorage.getItem('user');
+      if (user !== null) {
+        const parsedUser = JSON.parse(user);
+        if (parsedUser.username === username && parsedUser.password === password) {
+          Alert.alert('Success', 'Login successful');
+          navigation.navigate('Home');
+        } else {
+          Alert.alert('Error', 'Invalid credentials');
+        }
+      } else {
+        Alert.alert('Error', 'No user found. Please sign up first.');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Something went wrong. Please try again later.');
     }
   };
 
@@ -36,7 +50,9 @@ const LoginScreen = ({ navigation }) => {
       <Pressable style={styles.loginBtn} onPress={handleLogin}>
         <Text style={styles.loginTxt}>Login</Text>
       </Pressable>
-      <Text style={styles.signupTxt}>SignUp</Text>
+      <Pressable style={styles.signupBtn} onPress={() => navigation.navigate('Signup')}>
+        <Text style={styles.signupTxt}>Sign Up</Text>
+      </Pressable>
     </View>
   );
 };
@@ -54,7 +70,7 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   },
   signupTxt: {
-    marginVertical: 18,
+    marginVertical: 12,
     fontSize: 15,
     textAlign: 'center'
   },
@@ -72,8 +88,13 @@ const styles = StyleSheet.create({
     color: 'white',
     textAlign: 'center',
   },
+  signupBtn: {
+    paddingHorizontal: 12,
+    marginHorizontal: 'auto',
+  },
   title: {
     fontSize: 24,
+    fontWeight: 'bold',
     marginBottom: 24,
     textAlign: 'center',
   },
