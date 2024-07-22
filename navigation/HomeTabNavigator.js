@@ -26,10 +26,6 @@ const HomeTabNavigator = () => {
           return <Ionicons name={iconName} size={size} color={color} />;
         },
       })}
-    //   tabBarOptions={{
-    //     activeTintColor: 'tomato',
-    //     inactiveTintColor: 'gray',
-    //   }}
     >
       <Tab.Screen name="HomeTab" component={HomeScreen} options={{ title: 'Home' }} />
       <Tab.Screen name="Items" component={ItemsScreen} />
